@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
+import java.util.Random;
 
 
 @Controller
@@ -14,6 +15,11 @@ public class MainController {
 
     @Autowired
     CredentialRepository credentialRepository;
+    @Autowired
+    UserdetailRepository userdetailRepository;
+    @Autowired
+    UsertypelinkRepository usertypelinkRepository;
+
     @GetMapping("/")
     public String getLandingPage(){
         return "landingpage";
@@ -49,5 +55,25 @@ public class MainController {
 
             return "redirect:/login?error";
         }
+    }
+    @PostMapping ("/userdetails")
+    public String detail(@RequestParam("fname") String fname , @RequestParam("lname") String lname,@RequestParam("email") String email,@RequestParam("phone") String phone, HttpSession session, @RequestParam("type") String type ){
+        Userdetail ud=new Userdetail();
+        Usertypelink utl = new Usertypelink();
+        Random random = new Random();
+        ud.setUsername((String) session.getAttribute("username"));
+        utl.setUsername((String) session.getAttribute("username"));
+        ud.setFname(fname);
+        ud.setLname(lname);
+        ud.setEmail(email);
+        ud.setPhone(phone);
+        utl.setType(type);
+        int x = random.nextInt(5);
+        String id;
+        utl.setId(id= String.valueOf(x));
+        userdetailRepository.save(ud);
+        usertypelinkRepository.save(utl);
+        return "dashboard";
+
     }
 }
