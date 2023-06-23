@@ -40,8 +40,8 @@ public class MainController {
 @PostMapping("/signup")
     public String signup(@RequestParam("username") String username,@RequestParam("password") String password){
     Credential credential = new Credential();
-    credential.setUsername(username);
-    credential.setPassword(password);
+    credential.setUsername("Alex");
+    credential.setPassword("1234");
     credentialRepository.save(credential);
     return "landingpage";
     }
@@ -61,7 +61,7 @@ public class MainController {
             return "dashboard";
         };
 
-        return"/";
+        return "/";
 }
     @PostMapping ("/userdetails")
     public String detail(@RequestParam("fname") String fname , @RequestParam("lname") String lname,@RequestParam("email") String email,@RequestParam("phone") String phone, HttpSession session, @RequestParam("type") String type, Model model ){
