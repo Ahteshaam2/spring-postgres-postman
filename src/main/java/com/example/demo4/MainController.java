@@ -1,12 +1,14 @@
 package com.example.demo4;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
+import java.util.Optional;
 import java.util.Random;
 
 
@@ -29,35 +31,40 @@ public class MainController {
    public String saveCredential()
     {
        Credential cd = new Credential();
-      cd.setUsername("Alex");
-       cd.setPassword("1234");
+      cd.setUsername("Alexa");
+       cd.setPassword("12345");
        credentialRepository.save(cd);
-        return "New saved";
+        return "dashboard";
 
     }
 @PostMapping("/signup")
     public String signup(@RequestParam("username") String username,@RequestParam("password") String password){
     Credential credential = new Credential();
-    credential.setUsername("Alex");
-    credential.setPassword("1234");
+    credential.setUsername(username);
+    credential.setPassword(password);
     credentialRepository.save(credential);
-    return "dashboard";
+    return "landingpage";
     }
     @PostMapping("/login")
-    public String signin(@RequestParam("username") String username, @RequestParam("password") String password , HttpSession session) {
+    public String signin(@RequestParam("username") String username, @RequestParam("password") String password, HttpSession session, Model model){
 
-        Credential credential = credentialRepository.findByUsername(username);
-  session.setAttribute("username",username);
-        if (credential != null && credential.getPassword().equals(password)) {
+        Optional<Credential> credential=credentialRepository.findById(username);
+
+        if(credential.isPresent() && credential.get().getPassword().equals(password)){
+
+            session.setAttribute("username", username);
+            Optional<Userdetail> userdetail=userdetailRepository.findById(username);
+            if (userdetail.isPresent()){
+                model.addAttribute("userdetail",userdetail.get());
+            }
 
             return "dashboard";
-        } else {
+        };
 
-            return "redirect:/login?error";
-        }
-    }
+        return"/";
+}
     @PostMapping ("/userdetails")
-    public String detail(@RequestParam("fname") String fname , @RequestParam("lname") String lname,@RequestParam("email") String email,@RequestParam("phone") String phone, HttpSession session, @RequestParam("type") String type ){
+    public String detail(@RequestParam("fname") String fname , @RequestParam("lname") String lname,@RequestParam("email") String email,@RequestParam("phone") String phone, HttpSession session, @RequestParam("type") String type, Model model ){
         Userdetail ud=new Userdetail();
         Usertypelink utl = new Usertypelink();
         Random random = new Random();
@@ -73,7 +80,12 @@ public class MainController {
         utl.setId(id= String.valueOf(x));
         userdetailRepository.save(ud);
         usertypelinkRepository.save(utl);
+        session.getAttribute("username");
+        Optional<Userdetail> userdetail=userdetailRepository.findById((String) session.getAttribute("username"));
+        if (userdetail.isPresent()){
+            model.addAttribute("userdetail",userdetail.get());
+        }
         return "dashboard";
 
-    }
+}
 }
